@@ -45,7 +45,7 @@ let lastdrawnSize = 0;
 //TODO: this should be an array then we can store the separate letters too
 let word = "Hellovilag"
 let fr = 60;
-let picture_delay = 2
+let picture_delay = 5
 
 let update_incr = picture_delay;
 
@@ -91,17 +91,17 @@ function buttonClickedLoginnerText() {
 
 
 
-function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2) {
+function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, buttonWidth= 50) {
 	let buttonHeight = 30;
 	let buttonPadding = 0;
 	let boxPadding = 0;
 
 	// Calculate the maximum number of buttons that can fit in a row
-	let maxButtonsPerRow = floor((maxWidth - 2 * boxPadding) / 50);
+	let maxButtonsPerRow = floor((maxWidth - 2 * boxPadding) / buttonWidth);
 	let numRows = ceil(strings.length / maxButtonsPerRow);
 
 	// Calculate the width and height of the box
-	let boxWidth = min(strings.length, maxButtonsPerRow) * 50 + 2 * boxPadding;
+	let boxWidth = min(strings.length, maxButtonsPerRow) * buttonWidth + 2 * boxPadding;
 	let boxHeight = numRows * (buttonHeight + buttonPadding) + 2 * boxPadding;
 
 	// Draw the box
@@ -113,11 +113,11 @@ function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2) {
 	for (let i = 0; i < strings.length; i++) {
 		let row = floor(i / maxButtonsPerRow);
 		let col = i % maxButtonsPerRow;
-		let buttonX = x - boxWidth / 2 + boxPadding + col * 50;
+		let buttonX = x - boxWidth / 2 + boxPadding + col * buttonWidth;
 		let buttonY = y - boxHeight / 2 + boxPadding + row * (buttonHeight + buttonPadding) + buttonHeight / 2;
 		let button = createButton(strings[i]);
 		button.position(buttonX, buttonY);
-		button.size(50, buttonHeight);
+		button.size(buttonWidth, buttonHeight);
 		button.mousePressed(buttonClickedLoginnerText);
 	}
 	pop();
@@ -143,11 +143,15 @@ function setup() {
 	textAlign(CENTER, CENTER);
 	frameRate(fr);
 
-	let strings = ["cs", "dz", "dzs", "gy", "ny", "ty"];
+	let osszetettBetuk = ["cs", "dzs", "gy", "ly", "ny", "sz", "ty", "zs"];
 	let maxWidth = 500;
-	createButtonBox(strings, maxWidth, x = width / 2, y = 100);
+	createButtonBox(osszetettBetuk, maxWidth, x = width / 2, y = 100);
+
+	let szofajok = ["Főnév","határozó","ige","melléknév"];
+	createButtonBox(szofajok, maxWidth*2, x = width / 2, y = 150,75, );
 }
 
+//TODO: use push and pop functionality better, wait for all pictures to load before drawing, because like this sometimes draws fail if we dont wait enough
 function draw() {
 
 	//TODO: rewrite this to be better, based on length
