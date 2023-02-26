@@ -238,9 +238,24 @@ function refreshImages(letterArray) {
 	return [...newLetterArray];
 }
 
-let bigword
+let bigword;
 
+let input;
 
+function toggleKeyboard() {
+	if (!input) {
+	  // Create the input element
+	  input = createInput();
+	  input.position(-1000, -1000); // Position off-screen
+	  input.show();
+	  input.focus(); // Show the keyboard
+	} else {
+	  // Remove the input element
+	  input.hide();
+	  input.remove();
+	  input = null;
+	}
+  }
 
 function setup() {
 	createCanvas(750, 750);
@@ -262,7 +277,10 @@ function setup() {
 
 	let szofajok = ["Főnév","határozó","ige","melléknév"];
 	createButtonBox(szofajok, maxWidth*2, x = width / 2, y = 150,75, szofajOnClick);
-
+  // Create the button
+  let button = createButton('Toggle Keyboard');
+  button.mousePressed(toggleKeyboard);
+  button.position(width / 2,  50);
 }
 
 //TODO: use push and pop functionality better, wait for all pictures to load before drawing, because like this sometimes draws fail if we dont wait enough
