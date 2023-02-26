@@ -19,8 +19,8 @@ const url = geturl()
 
 
 //TODO: put this in preload, we dont need to reload the images each frame?
-function loadLetter(symboltype ,symbol = "a", thickness = 5) {
-	let path = url +symboltype+"/"+ symbol + "_" + thickness + ".png"
+function loadLetter(symboltype ,symbol = "a", thickness = 5,type ="png") {
+	let path = url +symboltype+"/"+ symbol + "_" + thickness + "." + type
 	var img = loadImage(path);
 	return img;
 }
@@ -38,14 +38,25 @@ function drawWord(letterArray, size = 300) {
 
 }
 
-//TODO: rename this to symbol
+class Transforms{
+	constructor(locationX,locationY,sizeX,SizeY,rotationClockwise){
+		this.locationX = locationX; 
+		this.locationY = locationY; 
+		this.sizeX = sizeX; 
+		this.SizeY = SizeY; 
+		this.rotationClockwise = rotationClockwise; 
+	}
+}
+
+//TODO: rename this to symbol and refactor all variables
 class Letter {
 	constructor(letter = "a", thickness = 5, type = "png",symboltype="letter") {
 		this.letter = letter;
 		this.thickness = thickness;
 		this.type = type;
+		this.symboltype = symboltype
 		//TODO: type handling
-		this.image = loadLetter(symboltype,letter, thickness);
+		this.image = loadLetter(symboltype,letter, thickness,type);
 
 	}
 
@@ -56,15 +67,20 @@ class Letter {
 
 	}
 
+	refreshImage(){
+		this.image = loadLetter(this.symboltype,this.letter, this.thickness,this.type);
+	}
 
 }
 
 class Word {
-	constructor() {
+	constructor(locationX=width/2,locationY=height/2,sizeX = 300,SizeY=300,rotationClockwise = 0) {
 		this.letters = []
 		this.szofaj;
 
 		//TODO: add location and rotation and size
+		this.transform = new Transforms(locationX,locationY,sizeX,SizeY,rotationClockwise);
+
 	}
 
 	addSzofaj(szofaj, thickness, type) {
@@ -117,7 +133,7 @@ class Word {
 		});
 		text(this.getText(), x , y+sizeX/2 +5);
 		console.log(this.getText(),x,y,y-sizeX/2 -5);
-		text("Írj valamit:)", width / 2 - 250, height / 15 + 10);
+		text("Írj valamit:) Ha homályos nyomj egy entert", width / 2 - 250, height / 15 + 10);
 	}
 
 	getText(){
@@ -132,6 +148,18 @@ class Word {
 		});
 		return text
 	}
+
+		//TODO: store size of image somewhere too! because like this we dont know the size
+	refreshImages() {
+		if(this.szofaj){
+			this.szofaj.refreshImage();
+		}
+		this.letters.forEach(element => {
+			element.refreshImage();
+		})
+	
+}
+
 }
 
 
@@ -230,15 +258,7 @@ function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, butto
 	pop();
 }
 
-//TODO: store size of image somewhere too! because like this we dont know the size
-function refreshImages(letterArray) {
-	let newLetterArray = [];
 
-	letterArray.forEach(element => {
-		addLetterToArray(element.letter, newLetterArray)
-	})
-	return [...newLetterArray];
-}
 
 let bigword
 
@@ -284,10 +304,7 @@ function keyPressed() {
 		wordInFocus.popLastLetter();
 		//TODO: make this periodic or have a better handling
 	} else if (key === "Enter") {
-		letter_images = refreshImages(letter_images);
-		//Force refresh
-		lastdrawnSize = -1
-		update_incr = picture_delay * 2;
+		wordInFocus.refreshImages();
 	} else if (key.match(/^[aábcdeéfghiíjklmnoóöőpqrstuúüűvwxyz]$/)) {
 		// If it is a letter, print it to the console
 		console.log(key);
