@@ -62,6 +62,7 @@ class Word {
 		this.letters = []
 		this.szofaj;
 
+		//TODO: add location and rotation and size
 	}
 
 	addSzofaj(szofaj, thickness, type) {
@@ -71,13 +72,15 @@ class Word {
 	addLetter(letter, thickness, type) {
 		this.letters.push(new Letter(letter, thickness, type))
 	}
-
+	popLastLetter(){
+		console.log("Popped: ",this.letters.pop())
+	}
 	getlength() {
 
 		let length = 0;
 		if (this.letters.length) {
 			if (this.szofaj) {
-				length = this.letters.length + this.szofaj;
+				length = this.letters.length + 1	;
 			} else {
 				length = this.letters.length;
 			}
@@ -89,9 +92,9 @@ class Word {
 		if(!this.szofaj){
 			return
 		}
-
-		this.szofaj.resize(sizeX, sizeY)
-		image(this.szofaj, x, y);
+		print(sizeX,sizeY,x,y)
+		this.szofaj.image.resize(sizeX, sizeY)
+		image(this.szofaj.image, x, y);
 	}
 
 	draw(sizeX, sizeY, x, y) {
@@ -100,7 +103,7 @@ class Word {
 
 		let letterSize = sizeX / length;
 		let increment = (sizeX - letterSize) / length;
-
+		console.log(length)
 		this.drawSzofaj(letterSize, letterSize, x, y)
 		letterSize += increment;
 
@@ -155,11 +158,13 @@ function addLetterToArray(newLetter, toArray, size = 5) {
 	//}
 }
 
+let wordInFocus;
 
 function letterOnClick() {
 	let letter = this.elt.innerText
 
-	addLetterToArray(letter, letter_images, 5);
+	wordInFocus.addLetter(letter,5);
+
 	//Force refresh
 	lastdrawnSize = -1
 	update_incr = picture_delay * 2;
@@ -168,7 +173,7 @@ function letterOnClick() {
 function szofajOnClick() {
 	let letter = this.elt.innerText
 
-	addSzofajToLetter(letter, letter_images, 5);
+	wordInFocus.addSzofaj(letter, 5);
 	//Force refresh
 	lastdrawnSize = -1
 	update_incr = picture_delay * 2;
@@ -229,20 +234,26 @@ function setup() {
 
 	textSize(32);
 	textAlign(CENTER, CENTER);
-	frameRate(1);
+	frameRate(60);
 	bigword = new Word();
-	bigword.addLetter("a");
-	bigword.addLetter("b");
-	bigword.addLetter("c");
-	bigword.addLetter("d");
 
-	console.log("Hello")
+
 	console.log(bigword.letters)
+	wordInFocus = bigword
+
+
+	let osszetettBetuk = ["cs","dz", "dzs", "gy", "ly", "ny", "sz", "ty", "zs"];
+	let maxWidth = 500;
+	createButtonBox(osszetettBetuk, maxWidth, x = width / 2, y = 100);
+
+	let szofajok = ["Főnév","határozó","ige","melléknév"];
+	createButtonBox(szofajok, maxWidth*2, x = width / 2, y = 150,75, szofajOnClick);
 
 }
 
 //TODO: use push and pop functionality better, wait for all pictures to load before drawing, because like this sometimes draws fail if we dont wait enough
 function draw() {
+	background(220);
 	bigword.draw(500, 500, width / 2, height / 2);
 	console.log(bigword)
 
@@ -253,7 +264,7 @@ function draw() {
 function keyPressed() {
 
 	if (key === "Backspace") {
-		popLetterFromArray(letter_images);
+		wordInFocus.popLastLetter();
 		//TODO: make this periodic or have a better handling
 	} else if (key === "Enter") {
 		letter_images = refreshImages(letter_images);
@@ -263,7 +274,7 @@ function keyPressed() {
 	} else if (key.match(/^[aábcdeéfghiíjklmnoóöőpqrstuúüűvwxyz]$/)) {
 		// If it is a letter, print it to the console
 		console.log(key);
-		addLetterToArray(key, letter_images);
+		wordInFocus.addLetter(key,5);
 	} else {
 		// If it is not a letter, do nothing
 		return;
