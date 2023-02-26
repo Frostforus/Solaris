@@ -18,8 +18,8 @@ const url = geturl()
 
 
 //TODO: put this in preload, we dont need to reload the images each frame?
-function loadLetter(letter = "a", tickness = 5) {
-	let path = url + letter + "_" + tickness + ".png"
+function loadLetter(letter = "a", thickness = 5) {
+	let path = url + letter + "_" + thickness + ".png"
 	var img = loadImage(path);
 	return img;
 }
@@ -37,6 +37,82 @@ function drawWord(letterArray, size = 300) {
 
 }
 
+class Letter {
+	constructor(letter = "a", thickness = 5, type = "png") {
+		this.letter = letter;
+		this.thickness = thickness;
+		this.type = type;
+		//TODO: type handling
+		this.image = loadLetter(letter, thickness);
+
+	}
+
+	draw(sizeX = this.image.width, sizeY = this.image.height, x = 250, y = 250) {
+		console.log(this.letter, sizeX, sizeY, x, y)
+		this.image.resize(sizeX, sizeY)
+		image(this.image, x, y);
+
+	}
+
+
+}
+
+class Word {
+	constructor() {
+		this.letters = []
+		this.szofaj;
+
+	}
+
+	addSzofaj(szofaj, thickness, type) {
+		this.szofaj = new Letter(szofaj, thickness, type)
+	}
+
+	addLetter(letter, thickness, type) {
+		this.letters.push(new Letter(letter, thickness, type))
+	}
+
+	getlength() {
+
+		let length = 0;
+		if (this.letters.length) {
+			if (this.szofaj) {
+				length = this.letters.length + this.szofaj;
+			} else {
+				length = this.letters.length;
+			}
+		}
+		return length;
+	}
+
+	drawSzofaj(sizeX, sizeY, x, y) {
+		if(!this.szofaj){
+			return
+		}
+
+		this.szofaj.resize(sizeX, sizeY)
+		image(this.szofaj, x, y);
+	}
+
+	draw(sizeX, sizeY, x, y) {
+		//TODO: Handle 0 1 2 length words put this in a function 
+		let length = this.getlength() <= 0 ? 1 : this.getlength();
+
+		let letterSize = sizeX / length;
+		let increment = (sizeX - letterSize) / length;
+
+		this.drawSzofaj(letterSize, letterSize, x, y)
+		letterSize += increment;
+
+		this.letters.forEach(letter => {
+			letter.draw(letterSize, letterSize, x, y)
+
+
+			letterSize += increment;
+		});
+
+	}
+}
 
 
 let letter_images = [];
@@ -68,30 +144,39 @@ function addLetterToArray(newLetter, toArray, size = 5) {
 	//TODO: resanitize thise
 	//if (isHungarianLetter(newLetter)) {
 
-			var letterAndImage = {};
+	var letterAndImage = {};
 
-			letterAndImage.letter = newLetter;
-			letterAndImage.image = loadLetter(newLetter, size);
-			toArray.push(letterAndImage);
-			
+	letterAndImage.letter = newLetter;
+	letterAndImage.image = loadLetter(newLetter, size);
+	toArray.push(letterAndImage);
+
 
 
 	//}
 }
 
 
-function buttonClickedLoginnerText() {
+function letterOnClick() {
 	let letter = this.elt.innerText
 
 	addLetterToArray(letter, letter_images, 5);
 	//Force refresh
 	lastdrawnSize = -1
-	update_incr = picture_delay *2;
+	update_incr = picture_delay * 2;
+}
+
+function szofajOnClick() {
+	let letter = this.elt.innerText
+
+	addSzofajToLetter(letter, letter_images, 5);
+	//Force refresh
+	lastdrawnSize = -1
+	update_incr = picture_delay * 2;
 }
 
 
 
-function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, buttonWidth= 50) {
+function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, buttonWidth = 50, onclickfunction = letterOnClick) {
 	let buttonHeight = 30;
 	let buttonPadding = 0;
 	let boxPadding = 0;
@@ -118,20 +203,23 @@ function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, butto
 		let button = createButton(strings[i]);
 		button.position(buttonX, buttonY);
 		button.size(buttonWidth, buttonHeight);
-		button.mousePressed(buttonClickedLoginnerText);
+		button.mousePressed(onclickfunction);
 	}
 	pop();
 }
 
 //TODO: store size of image somewhere too! because like this we dont know the size
-function refreshImages(letterArray){
+function refreshImages(letterArray) {
 	let newLetterArray = [];
 
-	letterArray.forEach(element =>{
-		addLetterToArray(element.letter,newLetterArray)
+	letterArray.forEach(element => {
+		addLetterToArray(element.letter, newLetterArray)
 	})
 	return [...newLetterArray];
 }
+
+let bigword
+
 
 
 function setup() {
@@ -141,57 +229,42 @@ function setup() {
 
 	textSize(32);
 	textAlign(CENTER, CENTER);
-	frameRate(fr);
+	frameRate(1);
+	bigword = new Word();
+	bigword.addLetter("a");
+	bigword.addLetter("b");
+	bigword.addLetter("c");
+	bigword.addLetter("d");
 
-	let osszetettBetuk = ["cs", "dzs", "gy", "ly", "ny", "sz", "ty", "zs"];
-	let maxWidth = 500;
-	createButtonBox(osszetettBetuk, maxWidth, x = width / 2, y = 100);
+	console.log("Hello")
+	console.log(bigword.letters)
 
-	let szofajok = ["Főnév","határozó","ige","melléknév"];
-	createButtonBox(szofajok, maxWidth*2, x = width / 2, y = 150,75, );
 }
 
 //TODO: use push and pop functionality better, wait for all pictures to load before drawing, because like this sometimes draws fail if we dont wait enough
 function draw() {
+	bigword.draw(500, 500, width / 2, height / 2);
+	console.log(bigword)
 
-	//TODO: rewrite this to be better, based on length
-	if (lastdrawnSize !== letter_images.length) {
-		//Wait for load
-		if (update_incr > 0) {
-			update_incr--;
-		} else {
-			background(220);
-			drawWord(letter_images, 500);
-			update_incr = picture_delay;
-			lastdrawnSize = letter_images.length;
-		}
-
-	}
-
-
-
-	text(getTextFromLetterImageArray(letter_images), width / 2, height / 10);
-	text("Írj valamit:)"+lastdrawnSize, width / 2 - 250, height / 15 + 10);
-	text("Ha homályos nyomj egy entert:o", width / 2 , height / 25 + 10);
 }
 
 //Since we have pngs i the backspace will mess it up
 
 function keyPressed() {
-	
+
 	if (key === "Backspace") {
 		popLetterFromArray(letter_images);
 		//TODO: make this periodic or have a better handling
-	} else 	if (key === "Enter") {
+	} else if (key === "Enter") {
 		letter_images = refreshImages(letter_images);
 		//Force refresh
 		lastdrawnSize = -1
-		update_incr = picture_delay *2;
+		update_incr = picture_delay * 2;
 	} else if (key.match(/^[aábcdeéfghiíjklmnoóöőpqrstuúüűvwxyz]$/)) {
 		// If it is a letter, print it to the console
 		console.log(key);
 		addLetterToArray(key, letter_images);
-	} else  {
+	} else {
 		// If it is not a letter, do nothing
 		return;
 	}
