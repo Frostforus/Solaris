@@ -5,21 +5,22 @@ function isHungarianLetter(char) {
 }
 
 //Works with github
-function geturl() {
+function geturl(imageType="png") {
 	let x = window.location.href
 	if (x === "http://127.0.0.1:5500/") {
 		x = "";
 	}
-	x += "letters/";
+	x += imageType+"/";
 	return x;
 }
 
+//TODO: this needs to be better
 const url = geturl()
 
 
 //TODO: put this in preload, we dont need to reload the images each frame?
-function loadLetter(letter = "a", thickness = 5) {
-	let path = url + letter + "_" + thickness + ".png"
+function loadLetter(symboltype ,symbol = "a", thickness = 5) {
+	let path = url +symboltype+"/"+ symbol + "_" + thickness + ".png"
 	var img = loadImage(path);
 	return img;
 }
@@ -37,13 +38,14 @@ function drawWord(letterArray, size = 300) {
 
 }
 
+//TODO: rename this to symbol
 class Letter {
-	constructor(letter = "a", thickness = 5, type = "png") {
+	constructor(letter = "a", thickness = 5, type = "png",symboltype="letter") {
 		this.letter = letter;
 		this.thickness = thickness;
 		this.type = type;
 		//TODO: type handling
-		this.image = loadLetter(letter, thickness);
+		this.image = loadLetter(symboltype,letter, thickness);
 
 	}
 
@@ -66,11 +68,11 @@ class Word {
 	}
 
 	addSzofaj(szofaj, thickness, type) {
-		this.szofaj = new Letter(szofaj, thickness, type)
+		this.szofaj = new Letter(szofaj, thickness, type,"szofaj")
 	}
 
 	addLetter(letter, thickness, type) {
-		this.letters.push(new Letter(letter, thickness, type))
+		this.letters.push(new Letter(letter, thickness, type,"letter"))
 	}
 	popLastLetter(){
 		console.log("Popped: ",this.letters.pop())
@@ -138,7 +140,7 @@ let lastdrawnSize = 0;
 
 //TODO: this should be an array then we can store the separate letters too
 let word = "Hellovilag"
-let fr = 60;
+let fr = 24;
 let picture_delay = 5
 
 let update_incr = picture_delay;
@@ -243,13 +245,13 @@ let bigword
 
 
 function setup() {
-	createCanvas(750, 750);
+	createCanvas(1500, 750);
 	imageMode(CENTER);
 	background(220);
 
 	textSize(32);
 	textAlign(CENTER, CENTER);
-	frameRate(60);
+	frameRate(fr);
 	bigword = new Word();
 
 
@@ -267,6 +269,7 @@ function setup() {
 
 //TODO: use push and pop functionality better, wait for all pictures to load before drawing, because like this sometimes draws fail if we dont wait enough
 function draw() {
+
 	background(220);
 	bigword.draw(500, 500, width / 2, height / 2);
 	
