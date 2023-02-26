@@ -260,7 +260,7 @@ function setup() {
 	let maxWidth = 500;
 	createButtonBox(osszetettBetuk, maxWidth, x = width / 2, y = 100);
 
-	let szofajok = ["Főnév","határozó","ige","melléknév"];
+	let szofajok = ["főnév","határozó","ige","melléknév"];
 	createButtonBox(szofajok, maxWidth*2, x = width / 2, y = 150,75, szofajOnClick);
 
 }
