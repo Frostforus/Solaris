@@ -103,7 +103,7 @@ class Word {
 
 		let letterSize = sizeX / length;
 		let increment = (sizeX - letterSize) / length;
-		console.log(length)
+
 		this.drawSzofaj(letterSize, letterSize, x, y)
 		letterSize += increment;
 
@@ -113,7 +113,22 @@ class Word {
 
 			letterSize += increment;
 		});
+		text(this.getText(), x , y+sizeX/2 +5);
+		console.log(this.getText(),x,y,y-sizeX/2 -5);
+		text("Írj valamit:)", width / 2 - 250, height / 15 + 10);
+	}
 
+	getText(){
+		let text = ""
+
+		if(this.szofaj){
+			text +="(" + this.szofaj.letter + ") "
+		}
+
+		this.letters.forEach(letter => {
+			text += letter.letter
+		});
+		return text
 	}
 }
 
@@ -238,7 +253,6 @@ function setup() {
 	bigword = new Word();
 
 
-	console.log(bigword.letters)
 	wordInFocus = bigword
 
 
@@ -255,7 +269,7 @@ function setup() {
 function draw() {
 	background(220);
 	bigword.draw(500, 500, width / 2, height / 2);
-	console.log(bigword)
+	
 
 }
 
