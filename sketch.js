@@ -194,6 +194,10 @@ function szofajOnClick() {
 	update_incr = picture_delay * 2;
 }
 
+function saveOnClick() {
+	let fileFormat = this.elt.innerText;
+	saveCanvas("solaris", fileFormat);
+}
 
 
 function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, buttonWidth = 50, onclickfunction = letterOnClick) {
@@ -262,6 +266,9 @@ function setup() {
 
 	let szofajok = ["főnév","határozó","ige","melléknév"];
 	createButtonBox(szofajok, maxWidth*2, x = width / 2, y = 150,75, szofajOnClick);
+
+	let saveFormats  = ["png","jpg"];
+	createButtonBox(saveFormats, maxWidth*2, x = width / 2, y = 700, 75, saveOnClick);
 
 }
 
