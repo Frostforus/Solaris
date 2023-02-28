@@ -38,6 +38,7 @@ function drawWord(letterArray, size = 300) {
 
 }
 
+//TODO: might be overkill
 class Transforms{
 	constructor(locationX,locationY,sizeX,SizeY,rotationClockwise){
 		this.locationX = locationX; 
@@ -57,13 +58,24 @@ class Letter {
 		this.symboltype = symboltype
 		//TODO: type handling
 		this.image = loadLetter(symboltype,letter, thickness,type);
+		//this.transform = new Transforms(locationX,locationY,sizeX,SizeY,rotationClockwise);
 
+		//TODO:
+		this.damping = 0.1;
 	}
 
-	draw(sizeX = this.image.width, sizeY = this.image.height, x = 250, y = 250) {
-		console.log(this.letter, sizeX, sizeY, x, y)
+	//The input parameters will come from the owner Word object,
+	//TODO: if we want a perfectlylooped gif, therotation of every symbol has to match up in a reasonable timeframe
+	draw(sizeX = this.image.width, sizeY = this.image.height, x = 150, y = 150) {
+		let rotationSpeed = 1/(sizeX*sizeX)*10000;
+		let rotationAngle = (frameCount * rotationSpeed) % 360;
+		push();
 		this.image.resize(sizeX, sizeY)
-		image(this.image, x, y);
+		translate(x, y);
+		rotate(radians(rotationAngle));
+		image(this.image, 0,0);
+		pop();
+		rotationSpeed *= (1 - this.damping);
 
 	}
 
@@ -167,7 +179,7 @@ let lastdrawnSize = 0;
 
 //TODO: this should be an array then we can store the separate letters too
 let word = "Hellovilag"
-let fr = 24;
+let fr = 60;
 let picture_delay = 5
 
 let update_incr = picture_delay;
