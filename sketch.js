@@ -133,7 +133,6 @@ class Word {
 		});
 		text(this.getText(), x , y+sizeX/2 +5);
 		console.log(this.getText(),x,y,y-sizeX/2 -5);
-		text("Írj valamit:) Ha homályos nyomj egy entert", width / 2 - 250, height / 15 + 10);
 	}
 
 	getText(){
@@ -224,6 +223,13 @@ function szofajOnClick() {
 	update_incr = picture_delay * 2;
 }
 
+function saveOnClick() {
+	let fileFormat = this.elt.innerText;
+	showText = false; //hide instructions before saving the canvas
+	draw(); //call draw without the text before saving
+	saveCanvas("solaris", fileFormat);
+	showText = true;
+}
 
 
 function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, buttonWidth = 50, onclickfunction = letterOnClick) {
@@ -261,7 +267,7 @@ function createButtonBox(strings, maxWidth, x = width / 2, y = height / 2, butto
 
 
 let bigword
-
+let showText = true;
 
 
 function setup() {
@@ -285,12 +291,18 @@ function setup() {
 	let szofajok = ["főnév","határozó","ige","melléknév"];
 	createButtonBox(szofajok, maxWidth*2, x = width / 2, y = 150,75, szofajOnClick);
 
+	let saveFormats  = ["png","jpg"];
+	createButtonBox(saveFormats, maxWidth*2, x = width / 2, y = 700, 75, saveOnClick);
+
 }
 
 //TODO: use push and pop functionality better, wait for all pictures to load before drawing, because like this sometimes draws fail if we dont wait enough
 function draw() {
 
 	background(220);
+	if (showText) {
+		text("Írj valamit:)", width / 2 - 250, height / 15 + 10);
+	}
 	bigword.draw(500, 500, width / 2, height / 2);
 	
 
