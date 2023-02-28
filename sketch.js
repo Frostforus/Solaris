@@ -115,7 +115,6 @@ class Word {
 		});
 		text(this.getText(), x , y+sizeX/2 +5);
 		console.log(this.getText(),x,y,y-sizeX/2 -5);
-		text("Írj valamit:)", width / 2 - 250, height / 15 + 10);
 	}
 
 	getText(){
@@ -196,7 +195,10 @@ function szofajOnClick() {
 
 function saveOnClick() {
 	let fileFormat = this.elt.innerText;
+	showText = false; //hide instructions before saving the canvas
+	draw(); //call draw without the text before saving
 	saveCanvas("solaris", fileFormat);
+	showText = true;
 }
 
 
@@ -243,7 +245,7 @@ function refreshImages(letterArray) {
 }
 
 let bigword
-
+let showText = true;
 
 
 function setup() {
@@ -275,6 +277,9 @@ function setup() {
 //TODO: use push and pop functionality better, wait for all pictures to load before drawing, because like this sometimes draws fail if we dont wait enough
 function draw() {
 	background(220);
+	if (showText) {
+		text("Írj valamit:)", width / 2 - 250, height / 15 + 10);
+	}
 	bigword.draw(500, 500, width / 2, height / 2);
 	
 
